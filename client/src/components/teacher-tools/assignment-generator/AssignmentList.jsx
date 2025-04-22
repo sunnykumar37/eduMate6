@@ -29,10 +29,11 @@ const AssignmentList = () => {
     try {
       setLoading(true);
       const data = await getAllAssignments();
-      setAssignments(data);
+      setAssignments(Array.isArray(data) ? data : []);
       setLoading(false);
     } catch (err) {
       setError('Failed to fetch assignments');
+      setAssignments([]);
       setLoading(false);
     }
   };
@@ -50,10 +51,11 @@ const AssignmentList = () => {
     try {
       setLoading(true);
       const data = await searchAssignments(searchParams);
-      setAssignments(data);
+      setAssignments(Array.isArray(data) ? data : []);
       setLoading(false);
     } catch (err) {
       setError('Failed to search assignments');
+      setAssignments([]);
       setLoading(false);
     }
   };

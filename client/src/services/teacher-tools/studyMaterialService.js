@@ -88,7 +88,7 @@ export const getAllStudyMaterials = async () => {
     console.error('Error fetching study materials:', error);
     // Return mock data for development
     await simulateDelay();
-    return mockStudyMaterials;
+    return mockStudyMaterials || [];
   }
 };
 
@@ -169,7 +169,7 @@ export const searchStudyMaterials = async (searchParams) => {
     // For development, filter mock data based on search params
     await simulateDelay();
     
-    let filteredMaterials = [...mockStudyMaterials];
+    let filteredMaterials = [...(mockStudyMaterials || [])];
     
     if (searchParams.title) {
       filteredMaterials = filteredMaterials.filter(material => 

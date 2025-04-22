@@ -283,7 +283,7 @@ export const getAllAssignments = async () => {
     console.error('Error fetching assignments:', error);
     // Return mock data for development
     await simulateDelay();
-    return mockAssignments;
+    return mockAssignments || [];
   }
 };
 
@@ -364,7 +364,7 @@ export const searchAssignments = async (searchParams) => {
     // For development, filter mock data based on search params
     await simulateDelay();
     
-    let filteredAssignments = [...mockAssignments];
+    let filteredAssignments = [...(mockAssignments || [])];
     
     if (searchParams.title) {
       filteredAssignments = filteredAssignments.filter(assignment => 

@@ -112,7 +112,7 @@ export const getAllCurriculum = async () => {
     console.error('Error fetching curriculum standards:', error);
     // Return mock data for development
     await simulateDelay();
-    return mockCurriculum;
+    return mockCurriculum || [];
   }
 };
 
@@ -193,7 +193,7 @@ export const searchCurriculum = async (searchParams) => {
     // For development, filter mock data based on search params
     await simulateDelay();
     
-    let filteredStandards = [...mockCurriculum];
+    let filteredStandards = [...(mockCurriculum || [])];
     
     if (searchParams.code) {
       filteredStandards = filteredStandards.filter(standard => 
