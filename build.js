@@ -7,25 +7,6 @@ if (!fs.existsSync('public')) {
   fs.mkdirSync('public', { recursive: true });
 }
 
-// Copy an empty vercel.json to public directory to ensure proper MIME types
-fs.writeFileSync(
-  path.join(__dirname, 'public', 'vercel.json'),
-  JSON.stringify({
-    "routes": [
-      {
-        "src": "^/assets/(.*)",
-        "headers": { "cache-control": "public, max-age=31536000, immutable" }
-      },
-      {
-        "src": "^/(.*).js$",
-        "headers": { "content-type": "application/javascript; charset=utf-8" }
-      },
-      { "handle": "filesystem" },
-      { "src": "/(.*)", "dest": "/index.html" }
-    ]
-  }, null, 2)
-);
-
 try {
   console.log('Installing dependencies...');
   execSync('npm install', { 
@@ -58,6 +39,50 @@ try {
     );
   }
   
+  // Create _redirects file for client-side routing
+  fs.writeFileSync(
+    path.join(__dirname, 'public', '_redirects'),
+    `/* /index.html 200`
+  );
+  
+  // Create vercel.json inside public folder for proper routing
+  fs.writeFileSync(
+    path.join(__dirname, 'public', 'vercel.json'),
+    JSON.stringify({
+      "rewrites": [
+        { "source": "/(.*)", "destination": "/index.html" }
+      ]
+    }, null, 2)
+  );
+
+  // Create a static 404.html that redirects to index.html
+  fs.writeFileSync(
+    path.join(__dirname, 'public', '404.html'),
+    `<!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title>EduMate - Teacher Tools</title>
+        <script type="text/javascript">
+          // Single Page Apps for GitHub Pages
+          // MIT License
+          // https://github.com/rafgraph/spa-github-pages
+          var segmentCount = 0;
+          var l = window.location;
+          l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '/?p=/' +
+            l.pathname.slice(1).split('/').slice(segmentCount).join('/').replace(/&/g, '~and~') +
+            (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+            l.hash
+          );
+        </script>
+      </head>
+      <body>
+      </body>
+    </html>`
+  );
+  
   console.log('Build completed successfully.');
 } catch (error) {
   console.error('Error during build:', error.message);
@@ -79,6 +104,12 @@ try {
         </div>
       </body>
     </html>`
+  );
+  
+  // Create _redirects file for client-side routing
+  fs.writeFileSync(
+    path.join(__dirname, 'public', '_redirects'),
+    `/* /index.html 200`
   );
   
   console.log('Created fallback page.');
