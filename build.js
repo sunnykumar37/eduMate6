@@ -1,43 +1,40 @@
-const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
+const fs = require('fs');
 
-// Create public directory if it doesn't exist
+// Ensure public directory exists
 if (!fs.existsSync('public')) {
-  fs.mkdirSync('public');
+  fs.mkdirSync('public', { recursive: true });
 }
 
-// Function to copy directory recursively
-function copyDir(src, dest) {
-  fs.mkdirSync(dest, { recursive: true });
-  const entries = fs.readdirSync(src, { withFileTypes: true });
-
-  for (let entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-
-    if (entry.isDirectory()) {
-      copyDir(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
-  }
-}
-
-// Build the client app
-console.log('Building client app...');
-const clientBuildResult = require('child_process').spawnSync(
-  'npm',
-  ['run', 'build'],
-  { cwd: path.join(__dirname, 'client'), stdio: 'inherit', shell: true }
+// Copy an empty vercel.json to public directory to ensure proper MIME types
+fs.writeFileSync(
+  path.join(__dirname, 'public', 'vercel.json'),
+  JSON.stringify({
+    "routes": [
+      {
+        "src": "^/assets/(.*)",
+        "headers": { "cache-control": "public, max-age=31536000, immutable" }
+      },
+      {
+        "src": "^/(.*).js$",
+        "headers": { "content-type": "application/javascript; charset=utf-8" }
+      },
+      { "handle": "filesystem" },
+      { "src": "/(.*)", "dest": "/index.html" }
+    ]
+  }, null, 2)
 );
 
-if (clientBuildResult.status !== 0) {
+// Build the client app (Vite will output directly to ../public)
+console.log('Building client app...');
+try {
+  execSync('npm run build', { 
+    cwd: path.join(__dirname, 'client'), 
+    stdio: 'inherit'
+  });
+  console.log('Build completed successfully.');
+} catch (error) {
   console.error('Error building client app');
   process.exit(1);
-}
-
-// Copy client build to public folder
-console.log('Copying client build to public folder...');
-copyDir(path.join(__dirname, 'client/dist'), path.join(__dirname, 'public'));
-
-console.log('Build completed successfully.'); 
+} 
