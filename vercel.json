@@ -1,11 +1,4 @@
 {
-  "version": 2,
-  "public": true,
   "buildCommand": "cd client && npm install && npm run build",
-  "outputDirectory": "client/dist",
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/assets/(.*)", "dest": "/assets/$1" },
-    { "src": "/(.*)", "dest": "/index.html" }
-  ]
+  "outputDirectory": "client/dist"
 } 
